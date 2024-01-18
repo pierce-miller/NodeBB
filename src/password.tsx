@@ -1,7 +1,7 @@
 'use strict';
 
 const path = require('path');
-const crypto = require('crypto');
+const crypt = require('crypto');
 const util = require('util');
 
 const bcrypt = require('bcryptjs');
@@ -25,7 +25,7 @@ function forkChild(message, callback) {
 const forkChildAsync = util.promisify(forkChild);
 
 exports.hash = async function (rounds, password) {
-    password = crypto.createHash('sha512').update(password).digest('hex');
+    password = crypt.createHash('sha512').update(password).digest('hex');
     return await forkChildAsync({ type: 'hash', rounds: rounds, password: password });
 };
 
@@ -33,7 +33,7 @@ exports.compare = async function (password, hash, shaWrapped) {
     const fakeHash = await getFakeHash();
 
     if (shaWrapped) {
-        password = crypto.createHash('sha512').update(password).digest('hex');
+        password = crypt.createHash('sha512').update(password).digest('hex');
     }
 
     return await forkChildAsync({ type: 'compare', password: password, hash: hash || fakeHash });
@@ -49,7 +49,7 @@ async function getFakeHash() {
 }
 
 // child process
-process.on('message', (msg) => {
+process.on('message', (msg:any) => {
     if (msg.type === 'hash') {
         tryMethod(hashPassword, msg);
     } else if (msg.type === 'compare') {
