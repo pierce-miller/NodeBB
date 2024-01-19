@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,13 +35,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var path = require('path');
-var crypt = require('crypto');
-var util = require('util');
-var bcrypt = require('bcryptjs');
-var fork = require('./meta/debugFork');
+exports.__esModule = true;
+exports.compare = exports.hash = void 0;
+var path = require("path");
+var crypto = require("crypto");
+var util = require("util");
+var bcrypt = require("bcrypt");
+var debugFork_1 = require("./meta/debugFork");
 function forkChild(message, callback) {
-    var child = fork(path.join(__dirname, 'password'));
+    // The next line calls a function in a module that has not been updated to TS yet
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    var child = (0, debugFork_1["default"])(path.join(__dirname, 'password'));
     child.on('message', function (msg) {
         callback(msg.err ? new Error(msg.err) : null, msg.result);
     });
@@ -52,19 +56,21 @@ function forkChild(message, callback) {
     child.send(message);
 }
 var forkChildAsync = util.promisify(forkChild);
-exports.hash = function (rounds, password) {
+function hash(rounds, password) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    password = crypt.createHash('sha512').update(password).digest('hex');
+                    password = crypto.createHash('sha512').update(password).digest('hex');
                     return [4 /*yield*/, forkChildAsync({ type: 'hash', rounds: rounds, password: password })];
                 case 1: return [2 /*return*/, _a.sent()];
             }
         });
     });
-};
-exports.compare = function (password, hash, shaWrapped) {
+}
+exports.hash = hash;
+;
+function compare(password, hash, shaWrapped) {
     return __awaiter(this, void 0, void 0, function () {
         var fakeHash;
         return __generator(this, function (_a) {
@@ -73,14 +79,16 @@ exports.compare = function (password, hash, shaWrapped) {
                 case 1:
                     fakeHash = _a.sent();
                     if (shaWrapped) {
-                        password = crypt.createHash('sha512').update(password).digest('hex');
+                        password = crypto.createHash('sha512').update(password).digest('hex');
                     }
                     return [4 /*yield*/, forkChildAsync({ type: 'compare', password: password, hash: hash || fakeHash })];
                 case 2: return [2 /*return*/, _a.sent()];
             }
         });
     });
-};
+}
+exports.compare = compare;
+;
 var fakeHashCache;
 function getFakeHash() {
     return __awaiter(this, void 0, void 0, function () {
@@ -104,7 +112,7 @@ process.on('message', function (msg) {
         tryMethod(hashPassword, msg);
     }
     else if (msg.type === 'compare') {
-        tryMethod(compare, msg);
+        tryMethod(compare1, msg);
     }
 });
 function tryMethod(method, msg) {
@@ -147,7 +155,7 @@ function hashPassword(msg) {
         });
     });
 }
-function compare(msg) {
+function compare1(msg) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -157,4 +165,3 @@ function compare(msg) {
         });
     });
 }
-require('./promisify')(exports);
