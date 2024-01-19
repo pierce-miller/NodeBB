@@ -40,7 +40,7 @@ exports.compare = exports.hash = void 0;
 var path = require("path");
 var crypto = require("crypto");
 var util = require("util");
-var bcrypt = require("bcrypt");
+var bcrypt = require("bcryptjs");
 var debugFork_1 = require("./meta/debugFork");
 function forkChild(message, callback) {
     // The next line calls a function in a module that has not been updated to TS yet

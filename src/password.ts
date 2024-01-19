@@ -3,7 +3,7 @@ const path = require("path");
 const crypto = require("crypto");
 const util = require("util");
 
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 import fork from './meta/debugFork';
 
